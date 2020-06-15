@@ -122,6 +122,18 @@ class Document extends Model\Asset
 
             return new Document\ImageThumbnail(null);
         }
+        
+        // Get thumbnail routine as in https://talk.pimcore.org/t/in-latest-pimcore-6-4-the-pdf-preview-is-not-working-on-grid/3149/5
+        if ($asset instanceof Asset\Document) {
+            // Fix preview document
+            // @see Pimcore\Model\Asset\Document getImageThumbnail method
+            try {
+                $asset->getCustomSetting(‘document_page_count’);
+            } catch (\Exception $e) {
+                $asset->processPageCount();
+            }
+            $thumbnail = $asset->getImageThumbnail('system-download');
+        } 
 
         return new Document\ImageThumbnail($this, $thumbnailName, $page, $deferred);
     }
